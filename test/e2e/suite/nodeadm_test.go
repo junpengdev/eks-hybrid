@@ -189,14 +189,14 @@ var _ = Describe("Hybrid Nodes", func() {
 
 					test.logger.Info("Resetting hybrid node...")
 					cleanNode := test.newCleanNode(provider, testNode.PeerdNode().Name, testNode.PeerdNode().Instance.IP)
-					Expect(cleanNode.Run(ctx)).To(Succeed(), "node should have been reset successfully")
+					Expect(testNode.PeeredNode.Reset(ctx, cleanNode, testNode.node)).To(Succeed(), "node should have been reset successfully")
 
 					test.logger.Info("Rebooting EC2 Instance.")
 					Expect(nodeadm.RebootInstance(ctx, test.remoteCommandRunner, testNode.PeerdNode().Instance.IP)).NotTo(HaveOccurred(), "EC2 Instance should have rebooted successfully")
 					test.logger.Info("EC2 Instance rebooted successfully.")
 
 					testNode.It("re-joins the cluster after reboot", func() {
-						Expect(testNode.verifyNode.WaitForNodeReady(ctx)).Error().To(Succeed(), "node should have re-joined, there must be a problem with uninstall")
+						Expect(testNode.PeeredNode.WaitForNodeReady(ctx, testNode.verifyNode, testNode.PeeredNetwork, testNode.node)).Error().To(Succeed(), "node should have re-joined, there must be a problem with uninstall")
 					})
 
 					Expect(testNode.Verify(ctx)).To(Succeed(), "node should be fully functional")
@@ -206,7 +206,7 @@ var _ = Describe("Hybrid Nodes", func() {
 						return
 					}
 
-					Expect(cleanNode.Run(ctx)).To(Succeed(), "node should have been reset successfully")
+					Expect(testNode.PeeredNode.Reset(ctx, cleanNode, testNode.node)).To(Succeed(), "node should have been reset successfully")
 				},
 				initEntries,
 			)
@@ -241,7 +241,9 @@ var _ = Describe("Hybrid Nodes", func() {
 						test.logger.Info("Skipping nodeadm uninstall from the hybrid node...")
 						return
 					}
-					Expect(test.newCleanNode(provider, testNode.PeerdNode().Name, testNode.PeerdNode().Instance.IP).Run(ctx)).To(
+
+					cleanNode := test.newCleanNode(provider, testNode.PeerdNode().Name, testNode.PeerdNode().Instance.IP)
+					Expect(testNode.PeeredNode.Reset(ctx, cleanNode, testNode.node)).To(
 						Succeed(), "node should have been reset successfully",
 					)
 				},

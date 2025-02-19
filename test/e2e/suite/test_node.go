@@ -37,6 +37,7 @@ type testNode struct {
 	OS              e2e.NodeadmOS
 	Provider        e2e.NodeadmCredentialsProvider
 	Region          string
+	PeeredNetwork   *peered.Network
 
 	flakyCode    *FlakyCode
 	node         *peered.PeerdNode
@@ -111,7 +112,7 @@ func (n *testNode) addReportEntries(peeredNode *peered.Node) {
 func (n *testNode) waitForNodeToJoin(ctx context.Context, flakeRun FlakeRun) {
 	n.Logger.Info("Waiting for EC2 Instance to be Running...")
 	flakeRun.RetryableExpect(ec2.WaitForEC2InstanceRunning(ctx, n.EC2Client, n.node.Instance.ID)).To(Succeed(), "EC2 Instance should have been reached Running status")
-	_, err := n.verifyNode.WaitForNodeReady(ctx)
+	err := n.PeeredNode.WaitForNodeReady(ctx, n.verifyNode, n.PeeredNetwork, n.node)
 	if err != nil {
 		isImpaired, oErr := ec2.IsEC2InstanceImpaired(ctx, n.EC2Client, n.node.Instance.ID)
 		Expect(oErr).NotTo(HaveOccurred(), "should describe instance status")
