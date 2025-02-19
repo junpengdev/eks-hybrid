@@ -13,10 +13,11 @@ import (
 
 // CleanNode runs the process to unregister a node from the cluster and uninstall all the installed kubernetes dependencies.
 type CleanNode struct {
-	K8s                 clientgo.Interface
-	RemoteCommandRunner commands.RemoteCommandRunner
-	Verifier            UninstallVerifier
-	Logger              logr.Logger
+	K8s                   clientgo.Interface
+	RemoteCommandRunner   commands.RemoteCommandRunner
+	Verifier              UninstallVerifier
+	InfrastructureCleaner NodeInfrastructureCleaner
+	Logger                logr.Logger
 
 	NodeName string
 	NodeIP   string
@@ -25,6 +26,11 @@ type CleanNode struct {
 // UninstallVerifier checks if nodeadm uninstall process was successful in a node.
 type UninstallVerifier interface {
 	VerifyUninstall(ctx context.Context, nodeName string) error
+}
+
+// Clean up any infra for EC2 node
+type NodeInfrastructureCleaner interface {
+	Cleanup(ctx context.Context) error
 }
 
 func (u CleanNode) Run(ctx context.Context) error {
@@ -54,6 +60,10 @@ func (u CleanNode) Run(ctx context.Context) error {
 	u.Logger.Info("Waiting for hybrid node to be not ready...")
 	if err = kubernetes.WaitForHybridNodeToBeNotReady(ctx, u.K8s, node.Name, u.Logger); err != nil {
 		return err
+	}
+
+	if err := u.InfrastructureCleaner.Cleanup(ctx); err != nil {
+		return fmt.Errorf("cleaning node infrastructure: %w", err)
 	}
 
 	u.Logger.Info("Deleting hybrid node from the cluster", "hybrid node", node.Name)

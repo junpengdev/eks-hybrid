@@ -40,6 +40,7 @@ type testNode struct {
 	PeeredNode      *peered.Node
 	Provider        e2e.NodeadmCredentialsProvider
 	Region          string
+	PeeredNetwork   *peered.Network
 
 	flakyCode    *FlakyCode
 	node         *peered.PeerdNode
@@ -94,6 +95,9 @@ func (n *testNode) Start(ctx context.Context) error {
 		n.serialOutput.It("joins the cluster", func() {
 			n.waitForNodeToJoin(ctx, flakeRun)
 		})
+
+		Expect(n.PeeredNetwork.CreateRoutesForNode(ctx, n.node)).Should(Succeed(), "EC2 route to pod CIDR should have been created successfully")
+
 		version, err := nodeadm.RunNodeadmVersion(ctx, n.PeeredNode.RemoteCommandRunner, n.node.Instance.IP)
 		Expect(err).NotTo(HaveOccurred(), "nodeadm version should have been retrieved successfully")
 		Expect(version).NotTo(BeEmpty(), "nodeadm version should not be empty")
