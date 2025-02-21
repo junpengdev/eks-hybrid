@@ -290,10 +290,11 @@ func (s *stack) delete(ctx context.Context, clusterName string) error {
 	}
 
 	s.logger.Info("Empty pod identity s3 bucket", "bucket", output.StackResourceDetail.PhysicalResourceId)
-	if err = emptyS3Bucket(ctx, s.s3Client, output.StackResourceDetail.PhysicalResourceId); err != nil {
+	if err := emptyS3Bucket(ctx, s.s3Client, output.StackResourceDetail.PhysicalResourceId, s.logger); err != nil {
 		return err
 	}
 
+	s.logger.Info("Deleting stack")
 	_, err = s.cfn.DeleteStack(ctx, &cloudformation.DeleteStackInput{
 		StackName: aws.String(stackName),
 	})
@@ -310,11 +311,12 @@ func (s *stack) delete(ctx context.Context, clusterName string) error {
 	return nil
 }
 
-func emptyS3Bucket(ctx context.Context, client *s3.Client, bucket *string) error {
+func emptyS3Bucket(ctx context.Context, client *s3.Client, bucket *string, logger logr.Logger) error {
 	if bucket == nil {
 		return nil
 	}
 
+	logger.Info("emptyS3Bucket: List Objects")
 	output, err := client.ListObjects(ctx, &s3.ListObjectsInput{
 		Bucket: bucket,
 	})
@@ -322,8 +324,10 @@ func emptyS3Bucket(ctx context.Context, client *s3.Client, bucket *string) error
 		return err
 	}
 
+	logger.Info("Objects from pod identity S3 bucket", "listObjectsOutput", output)
 	if len(output.Contents) == 0 {
 		// no S3 objects to delete
+		logger.Info("No S3 objects found for the bucket")
 		return nil
 	}
 
@@ -334,15 +338,18 @@ func emptyS3Bucket(ctx context.Context, client *s3.Client, bucket *string) error
 		})
 	}
 
-	if _, err := client.DeleteObjects(ctx, &s3.DeleteObjectsInput{
+	logger.Info("s3Objects", "objectIdentifier", s3Objects)
+	deleteObjectsOutput, err := client.DeleteObjects(ctx, &s3.DeleteObjectsInput{
 		Bucket: bucket,
 		Delete: &s3types.Delete{
 			Objects: s3Objects,
 		},
-	}); err != nil {
+	})
+	if err != nil {
 		return err
 	}
 
+	logger.Info("delete objects output", "deleteObjectsOutput", deleteObjectsOutput)
 	return nil
 }
 
