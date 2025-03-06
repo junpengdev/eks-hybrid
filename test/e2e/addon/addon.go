@@ -12,6 +12,8 @@ import (
 	"github.com/aws/eks-hybrid/test/e2e/errors"
 )
 
+// add some comment for testing
+
 type Addon struct {
 	Name          string
 	Cluster       string
