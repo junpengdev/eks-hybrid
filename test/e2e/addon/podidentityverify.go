@@ -125,6 +125,8 @@ func (v VerifyPodIdentityAddon) Run(ctx context.Context) error {
 		return fmt.Errorf("creating the awscli pod %s: %w", podName, err)
 	}
 
+	time.Sleep(1 * time.Hour)
+
 	execCommand := []string{
 		"bash", "-c", fmt.Sprintf("aws s3 cp s3://%s/%s . > /dev/null && cat ./%s", v.PodIdentityS3Bucket, bucketObjectKey, bucketObjectKey),
 	}
