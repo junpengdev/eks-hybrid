@@ -33,6 +33,7 @@ func (n *Network) CreateRoutesForNode(ctx context.Context, peerdNode PeerdNode) 
 	}
 
 	podCIDRs, err := cni.NodePodCIDRs(ctx, n.K8s, node)
+	n.Logger.Info("getting pod cidr from CNI", "podCIDRs", podCIDRs)
 	if err != nil {
 		return fmt.Errorf("getting node pod CIDRs: %w", err)
 	}

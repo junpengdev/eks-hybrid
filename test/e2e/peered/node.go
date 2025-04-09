@@ -290,7 +290,7 @@ func (c *NodeCleanup) Cleanup(ctx context.Context, node PeerdNode) error {
 	}
 
 	c.Logger.Info("Deleting routes for EC2 Instance", "instanceID", node.Instance.ID, "subnetID", c.Cluster.SubnetID)
-	if err := ec2.DeleteRoutesForInstance(ctx, c.EC2, c.Cluster.SubnetID, node.Instance.ID); err != nil {
+	if err := ec2.DeleteRoutesForInstance(ctx, c.EC2, c.Cluster.SubnetID, node.Instance.ID, c.Logger); err != nil {
 		return fmt.Errorf("deleting routes for EC2 Instance: %w", err)
 	}
 

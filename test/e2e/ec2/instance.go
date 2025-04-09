@@ -172,7 +172,7 @@ func DeleteEC2Instance(ctx context.Context, client *ec2.Client, instanceID strin
 
 // DeleteRoutesForInstance deletes the routes entries that point to the instance from
 // the tables associated with the given subnet.
-func DeleteRoutesForInstance(ctx context.Context, ec2Client *ec2.Client, subnetID, instanceID string) error {
+func DeleteRoutesForInstance(ctx context.Context, ec2Client *ec2.Client, subnetID, instanceID string, logger logr.Logger) error {
 	routeTables, err := ec2Client.DescribeRouteTables(ctx, &ec2.DescribeRouteTablesInput{
 		Filters: []types.Filter{
 			{
@@ -191,10 +191,11 @@ func DeleteRoutesForInstance(ctx context.Context, ec2Client *ec2.Client, subnetI
 				continue
 			}
 
-			_, err := ec2Client.DeleteRoute(ctx, &ec2.DeleteRouteInput{
+			output, err := ec2Client.DeleteRoute(ctx, &ec2.DeleteRouteInput{
 				RouteTableId:         routeTable.RouteTableId,
 				DestinationCidrBlock: route.DestinationCidrBlock,
 			})
+			logger.Info("deleting route", "routeTableId", routeTable.RouteTableId, "cidr", route.DestinationCidrBlock, "response", output)
 			if err != nil {
 				return fmt.Errorf("deleting route for instance %s: %w", instanceID, err)
 			}
