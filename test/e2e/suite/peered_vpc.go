@@ -194,14 +194,16 @@ func (t *peeredVPCTest) newPeeredNetwork() *peered.Network {
 	}
 }
 
-func (t *peeredVPCTest) newCleanNode(provider e2e.NodeadmCredentialsProvider, nodeName, nodeIP string) *nodeadm.CleanNode {
+func (t *peeredVPCTest) newCleanNode(provider e2e.NodeadmCredentialsProvider, node *peered.Node, nodeName, nodeIP, instance string) *nodeadm.CleanNode {
 	return &nodeadm.CleanNode{
-		K8s:                 t.k8sClient,
-		RemoteCommandRunner: t.remoteCommandRunner,
-		Verifier:            provider,
-		Logger:              t.logger,
-		NodeName:            nodeName,
-		NodeIP:              nodeIP,
+		K8s:                   t.k8sClient,
+		RemoteCommandRunner:   t.remoteCommandRunner,
+		Verifier:              provider,
+		Logger:                t.logger,
+		InfrastructureCleaner: node,
+		NodeName:              nodeName,
+		NodeIP:                nodeIP,
+		Instance:              instance,
 	}
 }
 

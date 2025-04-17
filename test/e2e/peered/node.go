@@ -322,13 +322,9 @@ func (c *NodeCleanup) Cleanup(ctx context.Context, node PeerdNode) error {
 	return nil
 }
 
-func (c *NodeCleanup) Reset(ctx context.Context, cleanNode *nodeadm.CleanNode, node *PeerdNode) error {
-	if err := cleanNode.Run(ctx); err != nil {
-		return err
-	}
-
+func (c *NodeCleanup) CleanupNodeInfrastructure(ctx context.Context, instance string) error {
 	// Delete routes for EC2 Instance
-	if err := ec2.DeleteRoutesForInstance(ctx, c.EC2, c.Cluster.SubnetID, node.Instance.ID); err != nil {
+	if err := ec2.DeleteRoutesForInstance(ctx, c.EC2, c.Cluster.SubnetID, instance); err != nil {
 		return fmt.Errorf("deleting routes for EC2 Instance: %w", err)
 	}
 

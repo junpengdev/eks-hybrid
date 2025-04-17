@@ -188,8 +188,9 @@ var _ = Describe("Hybrid Nodes", func() {
 					Expect(verifyPodIdentityAddon.Run(ctx)).To(Succeed(), "pod identity add-on should be created successfully")
 
 					test.logger.Info("Resetting hybrid node...")
-					cleanNode := test.newCleanNode(provider, testNode.PeerdNode().Name, testNode.PeerdNode().Instance.IP)
-					Expect(testNode.PeeredNode.Reset(ctx, cleanNode, testNode.node)).To(Succeed(), "node should have been reset successfully")
+					n := testNode.PeerdNode()
+					cleanNode := test.newCleanNode(provider, testNode.PeeredNode, n.Name, n.Instance.IP, n.Instance.ID)
+					Expect(cleanNode.Run(ctx)).To(Succeed(), "node should have been reset successfully")
 
 					test.logger.Info("Rebooting EC2 Instance.")
 					Expect(nodeadm.RebootInstance(ctx, test.remoteCommandRunner, testNode.PeerdNode().Instance.IP)).NotTo(HaveOccurred(), "EC2 Instance should have rebooted successfully")
@@ -206,7 +207,7 @@ var _ = Describe("Hybrid Nodes", func() {
 						return
 					}
 
-					Expect(testNode.PeeredNode.Reset(ctx, cleanNode, testNode.node)).To(Succeed(), "node should have been reset successfully")
+					Expect(cleanNode.Run(ctx)).To(Succeed(), "node should have been reset successfully")
 				},
 				initEntries,
 			)
@@ -242,8 +243,9 @@ var _ = Describe("Hybrid Nodes", func() {
 						return
 					}
 
-					cleanNode := test.newCleanNode(provider, testNode.PeerdNode().Name, testNode.PeerdNode().Instance.IP)
-					Expect(testNode.PeeredNode.Reset(ctx, cleanNode, testNode.node)).To(
+					n := testNode.PeerdNode()
+					cleanNode := test.newCleanNode(provider, testNode.PeeredNode, n.Name, n.Instance.IP, n.Instance.ID)
+					Expect(cleanNode.Run(ctx)).To(
 						Succeed(), "node should have been reset successfully",
 					)
 				},
