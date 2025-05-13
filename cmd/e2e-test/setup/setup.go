@@ -32,6 +32,13 @@ func NewCommand() *Command {
 	return &cmd
 }
 
+// TODO: Will remove later. This is to test if this command can be wrapped in kubetest2
+func NewCommandWithConfig(configFilePath string) *Command {
+	cmd := Command{}
+	cmd.configFilePath = configFilePath
+	return &cmd
+}
+
 func (c *Command) Flaggy() *flaggy.Subcommand {
 	return c.flaggy
 }
