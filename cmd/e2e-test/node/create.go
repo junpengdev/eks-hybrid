@@ -59,6 +59,20 @@ func NewCreateCommand() cli.Command {
 	return &cmd
 }
 
+//TODO: remove later, provide node create command to other packages. 
+func NewDefaultCreateCommnad(name, configFile string) cli.Command {
+	cmd := create{
+		os:            "al23",
+		arch:          "amd64",
+		instanceSize:  "Large",
+		credsProvider: "ssm",
+		instanceName:  name,
+		configFile:    configFile,
+	}
+
+	return &cmd
+}
+
 func (c *create) Flaggy() *flaggy.Subcommand {
 	return c.flaggy
 }
