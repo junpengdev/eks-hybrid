@@ -59,6 +59,17 @@ case $OS_TYPE in
         UBUNTU_VERSION="${VERSION_ID}"
         UBUNTU_VERSION_SHORT="${UBUNTU_VERSION/./}"
 
+        if [[ "$UBUNTU_VERSION" == "22.04" ]]; then
+            # Ubuntu 22.04 has an issue with gcc version 11 when build nvidia driver
+            # Ref:https://forums.developer.nvidia.com/t/linux-new-kernel-6-5-0-14-ubuntu-22-04-can-not-compile-nvidia-display-card-driver/278553/9
+            export NEEDRESTART_MODE=a
+            export DEBIAN_FRONTEND=noninteractive
+            apt install -y -qq gcc-12 gcc-11
+            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 11
+            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 12
+            update-alternatives --set gcc /usr/bin/gcc-12
+        fi
+
         # Add NVIDIA repository and install drivers
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu${UBUNTU_VERSION_SHORT}/${ARCH_DIR_NVIDIA}/cuda-keyring_1.1-1_all.deb
         dpkg -i cuda-keyring_1.1-1_all.deb
@@ -89,15 +100,14 @@ case $OS_TYPE in
         # Determine RHEL version and set up repository
         if [[ "$VERSION_ID" == "8"* ]]; then
             RHEL_VERSION="8"
-            dnf install -y kernel-devel-$(uname -r) kernel-headers
         elif [[ "$VERSION_ID" == "9"* ]]; then
             RHEL_VERSION="9"
-            dnf install -y kernel-devel-matched kernel-headers
         else
             echo "Unsupported RHEL version"
             exit 1
         fi
 
+        dnf install -y kernel-devel-$(uname -r) kernel-headers-$(uname -r)
         # This is to fix `Repositories disabled by configuration` error when enabling repos below
         subscription-manager config --rhsm.manage_repos=1
 
