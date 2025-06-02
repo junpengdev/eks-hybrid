@@ -70,7 +70,7 @@ func (n *testNode) Start(ctx context.Context) error {
 			NodeName:       n.NodeName,
 			OS:             n.OS,
 			Provider:       n.Provider,
-			GpuInstance: 	n.GpuInstance,
+			GpuInstance:    n.GpuInstance,
 		})
 		Expect(err).NotTo(HaveOccurred(), "EC2 Instance should have been created successfully")
 		flakeRun.DeferCleanup(func(ctx context.Context) {

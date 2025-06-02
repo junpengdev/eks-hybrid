@@ -282,7 +282,7 @@ func (t *PeeredVPCTest) NewTestNode(ctx context.Context, instanceName, nodeName,
 		OS:              os,
 		Provider:        provider,
 		Region:          t.Cluster.Region,
-		GpuInstance: 	 gpuInstance,
+		GpuInstance:     gpuInstance,
 	}
 
 	for _, opt := range opts {
@@ -459,7 +459,7 @@ type NodeCreate struct {
 	NodeName     string
 	OS           e2e.NodeadmOS
 	Provider     e2e.NodeadmCredentialsProvider
-	GpuInstance    bool
+	GpuInstance  bool
 }
 
 func CreateNodes(ctx context.Context, test *PeeredVPCTest, nodesToCreate []NodeCreate) {
