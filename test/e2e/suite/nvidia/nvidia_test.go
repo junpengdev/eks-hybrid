@@ -79,6 +79,17 @@ var _ = SynchronizedBeforeSuite(
 
 var _ = Describe("Hybrid Nodes", func() {
 	When("using peered VPC", func() {
-		// TODO: Run nvidia GPU tests below
+		var test *suite.NvidiaEc2Test
+
+		BeforeEach(func(ctx context.Context) {
+			test = &suite.NvidiaEc2Test{PeeredVPCTest: suite.BeforeVPCTest(ctx, suiteConfig)}
+		})
+
+		It("should have working NVIDIA GPU drivers", func(ctx context.Context) {
+			test.Logger.Info("Checking NVIDIA drivers on node")
+			devicePluginTest := test.NewNvidiaDevicePluginTest(numberOfNodes)
+			err := devicePluginTest.WaitForNvidiaDriverReady(ctx)
+			Expect(err).NotTo(HaveOccurred(), "NVIDIA drivers should be ready")
+		})
 	})
 })
