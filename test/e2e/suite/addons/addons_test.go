@@ -294,7 +294,7 @@ var _ = Describe("Hybrid Nodes", func() {
 			}, Label("cert-manager"))
 		})
 
-		When("using Bottlerocket ec2 instance as hybrid nodes", func() {
+		When("using Bottlerocket ec2 instance as hybrid nodes", Serial, func() {
 			It("runs node monitoring agent tests on Bottlerocket", func(ctx context.Context) {
 				// Create the node monitoring agent test using the standard method
 				nodeMonitoringAgent := addonEc2Test.NewNodeMonitoringAgentTest()
