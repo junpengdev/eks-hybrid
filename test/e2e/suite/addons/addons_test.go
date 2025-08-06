@@ -142,7 +142,7 @@ var _ = Describe("Hybrid Nodes", func() {
 		})
 
 		When("using ec2 instance as hybrid nodes", func() {
-			Describe("runs node monitoring agent tests", Ordered, func(ctx context.Context) {
+			Describe("runs node monitoring agent tests", Ordered, func() {
 				It("uses non Bottlerocket OS", func(ctx context.Context) {
 					nodeMonitoringAgent := addonEc2Test.NewNodeMonitoringAgentTest()
 
@@ -205,7 +205,7 @@ var _ = Describe("Hybrid Nodes", func() {
 				}, Label("bottlerocket"))
 			}, Label("node-monitoring-agent"))
 
-			Describe("runs kube state metrics tests", Ordered, func(ctx context.Context) {
+			Describe("runs kube state metrics tests", Ordered, func() {
 				It("uses non Bottlerocket OS", func(ctx context.Context) {
 					kubeStateMetrics := addonEc2Test.NewKubeStateMetricsTest()
 
@@ -263,7 +263,7 @@ var _ = Describe("Hybrid Nodes", func() {
 				}, Label("bottlerocket"))
 			}, Label("kube-state-metrics"))
 
-			Describe("runs metrics server tests", Ordered, func(ctx context.Context) {
+			Describe("runs metrics server tests", Ordered, func() {
 				It("uses non Bottlerocket OS", func(ctx context.Context) {
 					metricsServer := addonEc2Test.NewMetricsServerTest()
 
@@ -321,7 +321,7 @@ var _ = Describe("Hybrid Nodes", func() {
 				}, Label("bottlerocket"))
 			}, Label("metrics-server"))
 
-			Describe("runs prometheus node exporter tests", Ordered, func(ctx context.Context) {
+			Describe("runs prometheus node exporter tests", Ordered, func() {
 				It("uses non Bottlerocket OS", func(ctx context.Context) {
 					prometheusNodeExporter := addonEc2Test.NewPrometheusNodeExporterTest()
 
@@ -379,7 +379,7 @@ var _ = Describe("Hybrid Nodes", func() {
 				}, Label("bottlerocket"))
 			}, Label("prometheus-node-exporter"))
 
-			Describe("runs nvidia device plugin tests", Ordered, func(ctx context.Context) {
+			Describe("runs nvidia device plugin tests", Ordered, func() {
 				It("uses non Bottlerocket OS", func(ctx context.Context) {
 					// wait for nvidia drivers to be installed
 					addonEc2Test.Logger.Info("Checking NVIDIA drivers on pre-created GPU node", "nodeName", standardLinuxGPUNodeName)
@@ -401,7 +401,7 @@ var _ = Describe("Hybrid Nodes", func() {
 				}, Label("bottlerocket"))
 			}, Label("nvidia-device-plugin"))
 
-			Describe("runs cert manager and AWS PCA issuer tests", Ordered, func(ctx context.Context) {
+			Describe("runs cert manager and AWS PCA issuer tests", Ordered, func() {
 				It("uses non Bottlerocket OS", func(ctx context.Context) {
 					certManager, err := addonEc2Test.NewCertManagerTest(ctx)
 					Expect(err).To(Succeed(), "should have created cert-manager test")
