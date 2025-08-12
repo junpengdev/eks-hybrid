@@ -501,23 +501,6 @@ func (p *PCAIssuerTest) cleanupPrivateCA(ctx context.Context) error {
 		return fmt.Errorf("failed to delete CA: %v", err)
 	}
 
-	err = wait.PollUntilContextTimeout(ctx, defaultPollInterval, pcaIssuerWaitTimeout, true, func(ctx context.Context) (bool, error) {
-		describeInput := &acmpca.DescribeCertificateAuthorityInput{
-			CertificateAuthorityArn: p.PCAArn,
-		}
-
-		describeOutput, err := p.PCAClient.DescribeCertificateAuthority(ctx, describeInput)
-		if err != nil && e2errors.IsType(err, &types.ResourceNotFoundException{}) {
-			return true, nil
-		}
-
-		if describeOutput.CertificateAuthority.Status == types.CertificateAuthorityStatusDeleted {
-			return true, nil
-		}
-
-		return false, nil
-	})
-
 	p.Logger.Info("AWS Private Certificate Authority deleted successfully")
 	return nil
 }
