@@ -198,6 +198,7 @@ func (a *AddonEc2Test) NewExternalDNSTest(ctx context.Context) (*addon.ExternalD
 		Cluster:            a.Cluster.Name,
 		K8S:                a.K8sClient,
 		EKSClient:          a.EKSClient,
+		Route53Client:      a.Route53Client,
 		K8SConfig:          a.K8sClientConfig,
 		Logger:             a.Logger.WithName("ExternalDNSTest"),
 		PodIdentityRoleArn: podIdentityRoleArn,

@@ -664,6 +664,23 @@ Resources:
         - Key: !Ref TestClusterTagKey
           Value: !Ref ClusterName
       Path: !Ref RolePathPrefix
+
+  HostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Sub "${ClusterName}.local"
+      VPCs:
+        - VPCId: !Ref ClusterVPC
+          VPCRegion: !Ref AWS::Region
+      HostedZoneConfig:
+        Comment: !Sub "Private hosted zone for ${ClusterName} EKS hybrid cluster"
+      HostedZoneTags:
+        - Key: Name
+          Value: !Sub "${ClusterName}-hosted-zone"
+        - Key: !Ref TestClusterTagKey
+          Value: !Ref ClusterName
+        - Key: !Ref CreationTimeTagKey
+          Value: !Ref CreationTime
           
 
 Outputs:
