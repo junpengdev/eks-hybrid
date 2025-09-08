@@ -352,6 +352,16 @@ export function createNodeadmTestsCreationCleanupPolicy(
         actions: ['acm-pca:*'],
         resources: [`arn:aws:acm-pca:${stack.region}:${stack.account}:certificate-authority/*`],
       }),
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          'route53:ChangeResourceRecordSets',
+          'route53:CreateHostedZone',
+          'route53:DeleteHostedZone',
+          'route53:ListTagsForResources',
+        ],
+        resources: ['*'],
+      }),
     ],
   });
 }
