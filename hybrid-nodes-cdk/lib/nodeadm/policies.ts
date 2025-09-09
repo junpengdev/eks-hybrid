@@ -441,6 +441,26 @@ export function createNodeadmTestsCreationCleanupPolicies(
     ],
   });
 
+  // Route53 policy
+  const route53Policy = new iam.ManagedPolicy(stack, 'nodeadm-e2e-route53-policy', {
+    managedPolicyName: 'nodeadm-e2e-route53-policy',
+    statements: [
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          'route53:ChangeResourceRecordSets',
+          'route53:ChangeTagsForResource',
+          'route53:CreateHostedZone',
+          'route53:DeleteHostedZone',
+          'route53:GetHostedZone',
+          'route53:ListHostedZones',
+          'route53:ListTagsForResources',
+        ],
+        resources: ['*'],
+      }),
+    ],
+  });
+
   return [
     iamPolicy,
     ec2Policy,
@@ -450,7 +470,8 @@ export function createNodeadmTestsCreationCleanupPolicies(
     s3SecretsPolicy,
     rolesAnywhereLogsPolicy,
     taggingPolicy,
-    pcaPolicy
+    pcaPolicy,
+    route53Policy,
   ];
 }
 
