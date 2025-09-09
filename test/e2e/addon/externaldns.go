@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -126,7 +127,7 @@ func (e *ExternalDNSTest) getHostedZoneId(ctx context.Context) (*string, error) 
 	var hostedZoneIds []string
 
 	for _, hostedZone := range output.HostedZones {
-		hostedZoneIds = append(hostedZoneIds, *hostedZone.Id)
+		hostedZoneIds = append(hostedZoneIds, strings.Split(*hostedZone.Id, "/")[2])
 	}
 
 	listTagsOutput, err := e.Route53Client.ListTagsForResources(ctx, &route53.ListTagsForResourcesInput{
