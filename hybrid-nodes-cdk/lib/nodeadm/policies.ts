@@ -452,6 +452,7 @@ export function createNodeadmTestsCreationCleanupPolicies(
           'route53:ChangeTagsForResource',
           'route53:CreateHostedZone',
           'route53:DeleteHostedZone',
+          'route53:GetChange',
           'route53:GetHostedZone',
           'route53:ListHostedZones',
           'route53:ListTagsForResources',
