@@ -45,6 +45,20 @@ type ExternalDNSTest struct {
 
 // Create installs the external-dns addon
 func (e *ExternalDNSTest) Create(ctx context.Context) error {
+	hostedZoneId, err := e.getHostedZoneId(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get hosted zone id: %w", err)
+	}
+
+	e.HostedZoneId = *hostedZoneId
+	hostedZoneName, err := e.getHostedZoneName(ctx, hostedZoneId)
+	if err != nil {
+		return fmt.Errorf("failed to get hosted zone name: %w", err)
+	}
+
+	e.Logger.Info("Hosted zone", "Id", hostedZoneId, "Name", hostedZoneName)
+
+
 	e.addon = &Addon{
 		Cluster:   e.Cluster,
 		Namespace: externalDNSNamespace,
@@ -77,12 +91,6 @@ func (e *ExternalDNSTest) Create(ctx context.Context) error {
 // Validate checks if external-dns is working correctly
 func (e *ExternalDNSTest) Validate(ctx context.Context) error {
 	// TODO: add validate later
-	hostedZoneId, err := e.getHostedZoneId(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to get hosted zone id: %w", err)
-	}
-
-	e.Logger.Info("Hosted zone Id", "Id", hostedZoneId)
 	return nil
 }
 
@@ -147,4 +155,15 @@ func (e *ExternalDNSTest) getHostedZoneId(ctx context.Context) (*string, error) 
 	}
 
 	return nil, fmt.Errorf("hosted zone not found for cluster %s", e.Cluster)
+}
+
+func (e *ExternalDNSTest) getHostedZoneName(ctx context.Context, hostedZoneId *string) (*string, error) {
+	zoneOutput, err := e.Route53Client.GetHostedZone(ctx, &route53.GetHostedZoneInput{
+		Id: hostedZoneId,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get hosted zone: %w", err)
+	}
+
+	return zoneOutput.HostedZone.Name, nil
 }
