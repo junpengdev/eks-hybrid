@@ -297,11 +297,14 @@ export function createNodeadmTestsCreationCleanupPolicies(
         actions: [
           'eks:CreateAddon',
           'eks:CreatePodIdentityAssociation',
-          'eks:DeletePodIdentityAssociation',
           'eks:ListPodIdentityAssociations',
-          'eks:DescribePodIdentityAssociation',
         ],
         resources: [`arn:aws:eks:${stack.region}:${stack.account}:cluster/*`],
+      }),
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ['eks:DeletePodIdentityAssociation', 'eks:DescribePodIdentityAssociation'],
+        resources: [`arn:aws:eks:${stack.region}:${stack.account}:podidentityassociation/*`],
       }),
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
