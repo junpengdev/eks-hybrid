@@ -39,8 +39,9 @@ type ExternalDNSTest struct {
 	Route53Client      *route53.Client
 	K8SConfig          *rest.Config
 	Logger             logr.Logger
-	HostedZoneId       string
 	PodIdentityRoleArn string
+
+	hostedZoneId *string
 }
 
 // Create installs the external-dns addon
@@ -50,7 +51,7 @@ func (e *ExternalDNSTest) Create(ctx context.Context) error {
 		return fmt.Errorf("failed to get hosted zone id: %w", err)
 	}
 
-	e.HostedZoneId = *hostedZoneId
+	e.hostedZoneId = hostedZoneId
 	hostedZoneName, err := e.getHostedZoneName(ctx, hostedZoneId)
 	if err != nil {
 		return fmt.Errorf("failed to get hosted zone name: %w", err)
@@ -97,6 +98,10 @@ func (e *ExternalDNSTest) Validate(ctx context.Context) error {
 }
 
 func (e *ExternalDNSTest) Delete(ctx context.Context) error {
+	e.Logger.Info("Deleting hosted zone", "Id", *e.hostedZoneId)
+	if err := e.cleanupHostedZone(ctx, e.hostedZoneId); err != nil {
+		return fmt.Errorf("failed to cleanup hosted zone: %w", err)
+	}
 	return e.addon.Delete(ctx, e.EKSClient, e.Logger)
 }
 
@@ -168,4 +173,14 @@ func (e *ExternalDNSTest) getHostedZoneName(ctx context.Context, hostedZoneId *s
 	}
 
 	return zoneOutput.HostedZone.Name, nil
+}
+
+func (e *ExternalDNSTest) cleanupHostedZone(ctx context.Context, hostedZoneId *string) error {
+	_, err := e.Route53Client.DeleteHostedZone(ctx, &route53.DeleteHostedZoneInput{
+		Id: hostedZoneId,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to delete hosted zone: %w", err)
+	}
+	return nil
 }
