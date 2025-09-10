@@ -58,7 +58,7 @@ func (e *ExternalDNSTest) Create(ctx context.Context) error {
 
 	e.Logger.Info("Hosted zone", "Id", hostedZoneId, "Name", hostedZoneName)
 
-	configuration := fmt.Sprintf("{\"domainFilters\": [%s], \"policy\": \"sync\"}", *hostedZoneName)
+	configuration := fmt.Sprintf(`{"domainFilters": ["%s"], "policy": "sync"}`, *hostedZoneName)
 	e.Logger.Info("external-dns configuration", "configuration", configuration)
 	e.addon = &Addon{
 		Cluster:       e.Cluster,
