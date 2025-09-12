@@ -15,11 +15,17 @@ import (
 )
 
 type Addon struct {
-	Name          string
-	Namespace     string
-	Cluster       string
-	Configuration string
-	Version       string
+	Name                    string
+	Namespace               string
+	Cluster                 string
+	Configuration           string
+	Version                 string
+	PodIdentityAssociations []PodIdentityAssociation
+}
+
+type PodIdentityAssociation struct {
+	RoleArn        string
+	ServiceAccount string
 }
 
 const (
@@ -37,12 +43,21 @@ func (a Addon) Create(ctx context.Context, client *eks.Client, logger logr.Logge
 		}
 	}
 
+	var podIdentityAssociations []types.AddonPodIdentityAssociations
+	for _, association := range a.PodIdentityAssociations {
+		podIdentityAssociations = append(podIdentityAssociations, types.AddonPodIdentityAssociations{
+			RoleArn:        &association.RoleArn,
+			ServiceAccount: &association.ServiceAccount,
+		})
+	}
+
 	params := &eks.CreateAddonInput{
-		ClusterName:         &a.Cluster,
-		AddonName:           &a.Name,
-		ConfigurationValues: &a.Configuration,
-		AddonVersion:        &a.Version,
-		NamespaceConfig:     namespaceConfig,
+		ClusterName:              &a.Cluster,
+		AddonName:                &a.Name,
+		ConfigurationValues:      &a.Configuration,
+		AddonVersion:             &a.Version,
+		NamespaceConfig:          namespaceConfig,
+		PodIdentityAssociations:  podIdentityAssociations,
 	}
 
 	_, err := client.CreateAddon(ctx, params)
