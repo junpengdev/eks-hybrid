@@ -20,6 +20,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	s3v2 "github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	ssmv2 "github.com/aws/aws-sdk-go-v2/service/ssm"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo/v2"
@@ -59,17 +60,18 @@ type SuiteConfiguration struct {
 }
 
 type PeeredVPCTest struct {
-	aws             aws.Config
-	eksEndpoint     string
-	EKSClient       *eks.Client
-	EC2Client       *ec2v2.Client
-	SSMClient       *ssmv2.Client
-	cfnClient       *cloudformation.Client
-	K8sClient       peeredtypes.K8s
-	K8sClientConfig *rest.Config
-	S3Client        *s3v2.Client
-	IAMClient       *iam.Client
-	Route53Client   *route53.Client
+	aws                  aws.Config
+	eksEndpoint          string
+	EKSClient            *eks.Client
+	EC2Client            *ec2v2.Client
+	SSMClient            *ssmv2.Client
+	cfnClient            *cloudformation.Client
+	K8sClient            peeredtypes.K8s
+	K8sClientConfig      *rest.Config
+	S3Client             *s3v2.Client
+	IAMClient            *iam.Client
+	Route53Client        *route53.Client
+	SecretsManagerClient *secretsmanager.Client
 
 	Logger        logr.Logger
 	loggerControl e2e.PausableLogger
@@ -138,6 +140,7 @@ func BuildPeeredVPCTestForSuite(ctx context.Context, suite *SuiteConfiguration) 
 	test.cfnClient = cloudformation.NewFromConfig(aws)
 	test.IAMClient = iam.NewFromConfig(aws)
 	test.Route53Client = route53.NewFromConfig(aws)
+	test.SecretsManagerClient = secretsmanager.NewFromConfig(aws)
 
 	ca, err := credentials.ParseCertificate(suite.RolesAnywhereCACertPEM, suite.RolesAnywhereCAKeyPEM)
 	if err != nil {

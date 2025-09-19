@@ -133,6 +133,25 @@ func (a *AddonEc2Test) NewS3MountpointCSIDriverTest(ctx context.Context) (*addon
 	}, nil
 }
 
+// NewSecretsStoreCSIDriverTest creates a new SecretsStoreCSIDriverTest
+func (a *AddonEc2Test) NewSecretsStoreCSIDriverTest(ctx context.Context) (*addon.SecretsStoreCSIDriverTest, error) {
+	podIdentityRoleArn, err := addon.PodIdentityRole(ctx, a.IAMClient, a.Cluster.Name)
+	if err != nil {
+		a.Logger.Error(err, "Failed to get pod identity role ARN")
+		return nil, err
+	}
+
+	return &addon.SecretsStoreCSIDriverTest{
+		Cluster:              a.Cluster.Name,
+		K8S:                  a.K8sClient,
+		EKSClient:            a.EKSClient,
+		SecretsManagerClient: a.SecretsManagerClient,
+		K8SConfig:            a.K8sClientConfig,
+		Logger:               a.Logger.WithName("SecretsStoreCSIDriverTest"),
+		PodIdentityRoleArn:   podIdentityRoleArn,
+	}, nil
+}
+
 // NewCertManagerTest creates a new CertManagerTest
 func (a *AddonEc2Test) NewCertManagerTest(ctx context.Context) (*addon.CertManagerTest, error) {
 	// Create cert-manager client

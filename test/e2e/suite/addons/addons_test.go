@@ -401,6 +401,30 @@ var _ = Describe("Hybrid Nodes", func() {
 				})
 			}, Label("s3-mountpoint-csi-driver"))
 
+			Context("runs Secrets Store CSI driver tests", func() {
+				It("uses all OS", func(ctx context.Context) {
+					_, err := addonEc2Test.NewSecretsStoreCSIDriverTest(ctx)
+					Expect(err).To(Succeed(), "should have created secrets store CSI driver test")
+
+					// Comment out the below code when the add-on is available publicly on aws console
+
+					// secretsStoreTest, err := addonEc2Test.NewSecretsStoreCSIDriverTest(ctx)
+					// Expect(err).To(Succeed(), "should have created secrets store CSI driver test")
+
+					// DeferCleanup(func(ctx context.Context) {
+					// Expect(secretsStoreTest.Delete(ctx)).To(Succeed(), "should cleanup Secrets Store CSI driver successfully")
+					// })
+
+					// Expect(secretsStoreTest.Create(ctx)).To(
+					// Succeed(), "Secrets Store CSI driver should have been created successfully",
+					// )
+
+					// Expect(secretsStoreTest.Validate(ctx)).To(
+					//	Succeed(), "Secrets Store CSI driver should have been validated successfully",
+					// )
+				})
+			}, Label("secrets-store-csi-driver"))
+
 			Context("runs external-dns tests", func() {
 				It("uses all OS", func(ctx context.Context) {
 					externalDNSTest, err := addonEc2Test.NewExternalDNSTest(ctx)

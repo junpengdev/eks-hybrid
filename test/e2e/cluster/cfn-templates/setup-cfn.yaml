@@ -660,6 +660,15 @@ Resources:
                   - route53:ListHostedZones
                 Resource:
                   - '*'
+        - PolicyName: AllowSecretsManagerAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:*
+                Resource:
+                  - '*'
       Tags:
         - Key: !Ref TestClusterTagKey
           Value: !Ref ClusterName
@@ -681,7 +690,20 @@ Resources:
           Value: !Ref ClusterName
         - Key: !Ref CreationTimeTagKey
           Value: !Ref CreationTime
-          
+
+  MySecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub "${ClusterName}-MyTestSecret"
+      SecretString: |
+        {
+          "key": "MyTestSecret",
+        }
+      Tags:
+        - Key: !Ref TestClusterTagKey
+          Value: !Ref ClusterName
+        - Key: !Ref CreationTimeTagKey
+          Value: !Ref CreationTime
 
 Outputs:
   ClusterRole:
