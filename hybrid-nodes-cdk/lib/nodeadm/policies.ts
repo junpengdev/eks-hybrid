@@ -449,6 +449,18 @@ export function createNodeadmTestsCreationCleanupPolicies(
         ],
         resources: ['*'],
       }),
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          'secretsmanager:CreateSecret',
+          'secretsmanager:DeleteSecret',
+          'secretsmanager:DescribeSecret',
+          'secretsmanager:GetSecretValue',
+          'secretsmanager:ListSecrets',
+          'secretsmanager:TagResource',
+        ],
+        resources: ['*'],
+      }),
     ],
   });
 
