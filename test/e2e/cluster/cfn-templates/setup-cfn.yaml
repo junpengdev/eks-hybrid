@@ -697,7 +697,7 @@ Resources:
       Name: !Sub "${ClusterName}-MyTestSecret"
       SecretString: |
         {
-          "key": "MyTestSecret",
+          "key": "MyTestSecret"
         }
       Tags:
         - Key: !Ref TestClusterTagKey

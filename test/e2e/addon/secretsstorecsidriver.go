@@ -3,8 +3,8 @@ package addon
 import (
 	"context"
 	_ "embed"
-	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -133,7 +133,7 @@ func (s *SecretsStoreCSIDriverTest) Validate(ctx context.Context) error {
 		return fmt.Errorf("stderr is not empty: %s", stderr)
 	}
 
-	if !strings.Contains(stdout, s.secretValue) {
+	if trimAllLineBreaks(stdout) != trimAllLineBreaks(s.secretValue) {
 		return fmt.Errorf("expected secret value %s, got %s", s.secretValue, stdout)
 	}
 
@@ -192,26 +192,11 @@ func (s *SecretsStoreCSIDriverTest) extractSecretValue(ctx context.Context, secr
 		return fmt.Errorf("failed to get secret value: %w", err)
 	}
 
-	if getSecretValueOutput.SecretString == nil {
-		return fmt.Errorf("secret does not contain string data")
-	}
+	s.secretValue = *getSecretValueOutput.SecretString
+	return nil
+}
 
-	// The secret string returned by secrets manager API contains comma for last item in the json, which is invalid in json spec
-	// Golang follows strict json spec: https://www.json.org/json-en.html
-	// Assume there is only one item in our test secret
-	secretString := strings.ReplaceAll(*getSecretValueOutput.SecretString, ",", "")
-	// Parse the JSON secret
-	var secretData map[string]interface{}
-	if err = json.Unmarshal([]byte(secretString), &secretData); err != nil {
-		return fmt.Errorf("failed to parse secret JSON: %w", err)
-	}
-
-	// Find the first key-value pair (assuming single key for test)
-	for key, value := range secretData {
-		s.secretValue = fmt.Sprintf("%v", value)
-		s.Logger.Info("Extracted secret value for key", "key", key, "valueh", s.secretValue)
-		return nil
-	}
-
-	return fmt.Errorf("no key-value pairs found in secret")
+func trimAllLineBreaks(s string) string {
+	re := regexp.MustCompile(`[\r\n]+`)
+	return re.ReplaceAllString(s, "")
 }
